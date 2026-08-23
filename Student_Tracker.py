@@ -1,4 +1,4 @@
-from  fastapi import FastAPI
+from  fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 app = FastAPI(title = "Study Group Tracker")
 
@@ -34,7 +34,7 @@ def get_student(student_id: int):
         if student["id"] == student_id:
             return student
 
-    return {"message": "Student not found"}
+    raise HTTPException(status_code=404, detail="Student not found")
 
 class StudentUpdate(BaseModel):
     name: str = Field(min_length=2, max_length=60)
@@ -48,7 +48,7 @@ def update_student(student_id: int, payload: StudentUpdate):
             student.update(payload.model_dump())
             return student
 
-    return {"message": "Student not found"}
+    raise HTTPException(status_code=404, detail="Student not found")
     
 @app.delete("/students/{student_id}")
 def delete_student(student_id: int):
@@ -57,5 +57,5 @@ def delete_student(student_id: int):
             students.remove(student)
             return {"message": "Student deleted successfully"}
 
-    return {"message": "Student not found"}
+    raise HTTPException(status_code=404, detail="Student not found")
 
