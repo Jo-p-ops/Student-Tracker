@@ -31,11 +31,12 @@ def create_student(payload: StudentCreate):
 
 @app.get("/students", response_model=list[StudentResponse])
 def get_students(track: str | None = None, name: str | None=None):
+    results = students
     if track:
-        return [students for students in students if students["track"]==track]
+        rusults = [students for students in students if students["track"]==track]
     if name:
-        return [students for students in students if name.lower() in students["name"].lower()]    
-    return students
+        results= [students for students in students if name.lower() in students["name"].lower()]    
+    return results
 
 
 @app.get("/students/{student_id}", response_model= StudentResponse)
