@@ -1,4 +1,4 @@
-from  fastapi import FastAPI, HTTPException
+from  fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, EmailStr, Field
 app = FastAPI(title = "Study Group Tracker")
 
@@ -11,12 +11,14 @@ class StudentCreate(BaseModel):
     email: EmailStr
     track: str = Field(default="backend")
 
-class StudentResponse(BaseModel):
+class StudentResponse(BaseModel):  
     id: int
     name: str
     email: EmailStr
     track: str
-
+    
+class MessageResponse(BaseModel): 
+    message: str
 
 @app.post("/students", status_code=201, response_model=StudentResponse)
 def create_student(payload: StudentCreate):
@@ -30,13 +32,14 @@ def create_student(payload: StudentCreate):
 
 
 @app.get("/students", response_model=list[StudentResponse])
-def get_students(track: str | None = None, name: str | None=None):
+def get_students(track: str | None = None, name: str | None=None,
+skip: int=Query(default=0, ge=0), limit: int=Query(default=10,ge=1, le=100)):
     results = students
     if track:
         rusults = [students for students in students if students["track"]==track]
     if name:
         results= [students for students in students if name.lower() in students["name"].lower()]    
-    return results
+    return results[skip:skip+limit]
 
 
 @app.get("/students/{student_id}", response_model= StudentResponse)
@@ -62,7 +65,7 @@ def update_student(student_id: int, payload: StudentUpdate):
 
     raise HTTPException(status_code=404, detail="Student not found")
     
-@app.delete("/students/{student_id}")
+@app.delete("/students/{student_id}",response_model=MessageResponse)
 def delete_student(student_id: int):
     for student in students:
         if student["id"] == student_id:
