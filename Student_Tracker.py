@@ -11,8 +11,14 @@ class StudentCreate(BaseModel):
     email: EmailStr
     track: str = Field(default="backend")
 
+class StudentResponse(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    track: str
 
-@app.post("/Students", status_code=201)
+
+@app.post("/students", status_code=201, response_model=StudentResponse)
 def create_student(payload: StudentCreate):
     student_dict = payload.model_dump()
 
@@ -23,12 +29,12 @@ def create_student(payload: StudentCreate):
     return student_dict
 
 
-@app.get("/Students")
+@app.get("/students", response_model=list[StudentResponse])
 def get_students():
-    return Students
+    return students
 
 
-@app.get("/students/{student_id}")
+@app.get("/students/{student_id}", response_model= StudentResponse)
 def get_student(student_id: int):
     for student in students:
         if student["id"] == student_id:
@@ -41,7 +47,8 @@ class StudentUpdate(BaseModel):
     email: EmailStr
     track: str
 
-@app.put("/students/{student_id}")
+
+@app.put("/students/{student_id}",response_model=StudentResponse)
 def update_student(student_id: int, payload: StudentUpdate):
     for student in students:
         if student["id"] == student_id:
