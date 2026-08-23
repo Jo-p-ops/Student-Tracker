@@ -34,7 +34,7 @@ def get_students(track: str | None = None, name: str | None=None):
     if track:
         return [students for students in students if students["track"]==track]
     if name:
-        return [students for students in students if students["name"]==name]    
+        return [students for students in students if name.lower() in students["name"].lower()]    
     return students
 
 
